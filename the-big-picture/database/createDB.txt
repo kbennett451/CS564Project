@@ -1,0 +1,134 @@
+CREATE TABLE reviewTemp (
+    link VARCHAR(255),
+    cname VARCHAR(255),
+    topCrit VARCHAR(255),
+    pname VARCHAR(255),
+    type VARCHAR(255),
+    score VARCHAR(255),
+    date VARCHAR(255),
+    content VARCHAR(2000)
+);
+
+.mode csv
+.import --skip 1 /Users/Griffin/dev/classes/cs564/CS564Project/the-big-picture/database/rotten_tomatoes_critic_reviews.csv reviewTemp
+
+CREATE TABLE review (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    link VARCHAR(255),
+    content VARCHAR(2000)
+);
+
+INSERT INTO Review (link, content)
+SELECT link, content
+FROM reviewTemp;
+
+DROP TABLE reviewTemp;
+
+CREATE TABLE Movie (
+    id INTEGER PRIMARY KEY, 
+    title VARCHAR(255),
+    info VARCHART(2000),
+    releaseDate DATE, 
+    runtime INTEGER, 
+    rating INTEGER,
+    link VARCHAR(255)
+);
+
+.mode csv
+.import --skip 1 /Users/Griffin/dev/classes/cs564/CS564Project/the-big-picture/database/movies.csv Movie
+
+CREATE TABLE Describes (
+    rID INTEGER, 
+    mID INTEGER,
+    PRIMARY KEY (rID, mID)
+);
+
+INSERT INTO Describes (rID, mID)
+SELECT Review.ID rID, Movie.ID mID
+FROM Movie
+INNER JOIN Review ON Review.link = Movie.link;
+
+CREATE TABLE actor_id_map (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    name VARCHAR(255)
+);
+
+CREATE TABLE actorTemp (
+    link VARCHAR(255),
+    name VARCHAR(255)
+);
+
+.mode csv
+.import --skip 1 /Users/Griffin/dev/classes/cs564/CS564Project/the-big-picture/database/actors.csv actorTemp
+
+INSERT INTO actor_id_map (name)
+SELECT DISTINCT actorTemp.name
+FROM actorTemp;
+
+CREATE TABLE Actor (
+    id INTEGER PRIMARY KEY, 
+    name VARCHAR(255)
+);
+
+INSERT INTO Actor (id, name)
+SELECT DISTINCT actor_id_map.id, actorTemp.name
+FROM actor_id_map
+INNER JOIN actorTemp ON actor_id_map.name = actorTemp.name;
+
+CREATE TABLE StarsIn (
+    aID INTEGER, 
+    mID INTEGER,
+    PRIMARY KEY (aID, mID)
+);
+
+INSERT INTO StarsIn (aID, mID)
+SELECT DISTINCT actor_id_map.ID aID, Movie.ID mID
+FROM actor_id_map 
+INNER JOIN actorTemp ON actorTemp.name = actor_id_map.name
+INNER JOIN Movie ON Movie.link = actorTemp.link;
+
+DROP TABLE actorTemp;
+DROP TABLE actor_id_map;
+
+CREATE TABLE director_id_map (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    name VARCHAR(255)
+);
+
+CREATE TABLE directorTemp (
+    link VARCHAR(255),
+    name VARCHAR(255)
+);
+
+.mode csv
+.import --skip 1 /Users/Griffin/dev/classes/cs564/CS564Project/the-big-picture/database/directors.csv directorTemp
+
+INSERT INTO director_id_map (name)
+SELECT DISTINCT directorTemp.name
+FROM directorTemp;
+
+CREATE TABLE Director (
+    id INTEGER PRIMARY KEY, 
+    name VARCHAR(255)
+);
+
+INSERT INTO Director (id, name)
+SELECT DISTINCT director_id_map.id, directorTemp.name
+FROM director_id_map
+INNER JOIN directorTemp ON director_id_map.name = directorTemp.name;
+
+
+CREATE TABLE Directs (
+    dID INTEGER, 
+    mID INTEGER, 
+    PRIMARY KEY (dID, mID)
+);
+
+INSERT INTO Directs (dID, mID)
+SELECT DISTINCT director_id_map.ID dID, Movie.ID mID
+FROM director_id_map 
+INNER JOIN directorTemp ON directorTemp.name = director_id_map.name
+INNER JOIN Movie ON Movie.link = directorTemp.link;
+
+DROP TABLE director_id_map;
+DROP TABLE directorTemp;
