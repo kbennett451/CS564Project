@@ -1,0 +1,164 @@
+*,
+*::before,
+*::after {
+  font-family: inherit;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+  background-color: azure;
+}
+
+.body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.hide {
+  display: none !important;
+}
+
+.find-a-movie .submission {
+  width: 100%;
+  height: 9%;
+  /*border: 2px solid blueviolet;*/
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.find-a-movie button {
+  margin: 10px;
+  padding: 5px;
+}
+
+.find-a-movie .view-area {
+  height: 100vh;
+  width: 75vw;
+  /*border: 2px solid black;*/
+  float: left;
+}
+
+.find-a-movie .entry-space {
+  height: 80%;
+  width: 100%;
+  padding: 5px;
+  /*border: 2px solid blue;*/
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+}
+
+.find-a-movie .selection-container {
+  height: 10%;
+  width: 100%;
+  /*border: 2px solid red;*/
+  text-align: left;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 10px;
+}
+
+.find-a-movie label {
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+.find-a-movie input {
+  margin: 10px;
+  float: right;
+}
+
+.find-a-movie .title {
+  padding: 10px;
+  padding-top: 15px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.find-a-movie .sidebar {
+  height: 100vh;
+  width: 25vw;
+  /*order: 2px solid blue;*/
+  float: right;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.find-a-movie .item {
+  width: 80%;
+  padding: 10px;
+  /*border: 2px solid red;*/
+  background-color: #00adc4;
+  border-radius: 10px;
+  text-align: center;
+  color: aliceblue;
+  font-size: 1.2rem;
+}
+
+.find-a-movie .item:hover {
+  cursor: pointer;
+}
+
+.main-menu {
+  height: 100vh;
+  width: 100vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+}
+
+.main-menu span {
+  margin: 5px;
+  padding: 25px;
+  border-radius: 10px;
+  color: aliceblue;
+  background-color: #00adc4;
+  /*border: 2px solid red;*/
+}
+
+.main-menu span:hover {
+  cursor: pointer;
+}
+/*# sourceMappingURL=base.css.map */

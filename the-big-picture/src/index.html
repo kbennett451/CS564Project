@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>The Big Picture</title>
+    <link rel="stylesheet" href="./base.css">
+  </head>
+  <body>
+    <!--Main Menu Content-->
+    <div class="main-menu">
+      <span id="find-a-movie-button">Find a Movie</span>
+      <span id="add-a-movie-button">Add a Movie</span>
+    </div>
+
+    <!--Find/Add Movie Content-->
+    <div class="find-a-movie hide">
+      <div class="view-area">
+        <p class="title" id="find/add-title">Find a Movie</p>
+        <div class="entry-space">
+          <div class="selection-container" id="title-input-container">
+            <label for="title">Title:</label>
+            <input type="text" name="title">
+          </div>
+          <div class="selection-container" id="price-input-container">
+            <label for="price">Price:</label>
+            <input type="number" name="price" id="">
+          </div>
+          <div class="selection-container " id="year-input-container">
+            <label for="year">Year:</label>
+            <input type="number" name="year" id="">
+          </div>
+          <div class="selection-container" id="rating-input-container">
+            <label for="rating">Rating:</label>
+            <!--Maybe buttons would be good here-->
+            <input type="number" name="rating" id="">
+          </div>
+          <div class="selection-container " id="runtime-input-container">
+            <label for="runtime">Runtime:</label>
+            <input type="number" name="runtime" id="">
+          </div>
+          <div class="selection-container" id="actor-input-container">
+            <label for="actor">Actor/Actress:</label>
+            <input type="text" name="actor" id="">
+          </div>
+          <div class="selection-container" id="director-input-container">
+            <label for="director">Director:</label>
+            <input type="text" name="director" id="">
+          </div>
+        </div> <!--entry space end-->
+        <div class="submission">
+          <button id="back">Back</button>
+          <button id="find/add-button">Find</button>
+        </div>
+      </div> <!--View area end-->
+      <div class="sidebar">
+        <span class="item">Title</span>
+        <span class="item">Price</span>
+        <span class="item">Year</span>
+        <span class="item">Rating</span>
+        <span class="item">Runtime</span>
+        <span class="item">Actor/Actress</span>
+        <span class="item">Director</span>
+      </div> <!-- sidebar end -->
+    </div> <!--find a movie end-->
+
+    <!--View Movie Content-->
+  </body>
+  <script src='./rerender.js'></script>
+</html>
