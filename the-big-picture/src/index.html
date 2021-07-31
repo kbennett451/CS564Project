@@ -7,7 +7,7 @@
   </head>
   <body>
     <!--Main Menu Content-->
-    <div class="main-menu">
+    <div class="main-menu hide">
       <span id="find-a-movie-button">Find a Movie</span>
       <span id="add-a-movie-button">Add a Movie</span>
     </div>
@@ -64,6 +64,46 @@
     </div> <!--find a movie end-->
 
     <!--View Movie Content-->
+    <div class="movie-view" id="movie-view">
+      <div class="title">
+        <span>Movie Title</span>
+      </div>
+      <div class="section1">
+        <div>
+          <label for="director">Director:</label>
+          <input class="edit-item hide" type="text" name="director">
+        </div>
+        <div>
+
+        </div>
+        <div>
+          <ul>Actor / Actress</ul>
+        </div>
+      </div>
+      <div class="section2"> 
+        <div>
+          <label for="rating">Rating:</label>
+          <input class="edit-item hide" type="number" name="rating" id="">
+        </div>
+        <div>
+          <label for="price">Price:</label>
+          <input class="edit-item hide" type="number" name="price" id="">
+        </div>
+        <div>
+          <label for="runtime">Runtime:</label>
+          <input class="edit-item hide" type="time" name="runtime" id="">
+        </div>
+        <div>
+          <label for="year">Year:</label>
+          <input class="edit-item hide" type="number" name="year" id="">
+        </div>
+      </div>
+      <div class="submission button-area">
+        <button id="movie-back">Back</button>
+        <button id="edit">Edit</button>
+        <button id="save" class="hide">Save</button>
+      </div>
+    </div>
   </body>
   <script src='./rerender.js'></script>
 </html>

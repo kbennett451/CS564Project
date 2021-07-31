@@ -20,20 +20,21 @@
     display: none !important;
 }
 
+.submission {
+    width: 100%;
+    height: 9%;
+    /*border: 2px solid blueviolet;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    margin: 10px;
+    padding: 5px;
+}
+
 .find-a-movie {
-    .submission {
-        width: 100%;
-        height: 9%;
-        /*border: 2px solid blueviolet;*/
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    button {
-        margin: 10px;
-        padding: 5px;
-    }
     
     .view-area {
         height: 100vh;
@@ -124,5 +125,53 @@
 
     span:hover {
         cursor: pointer;
+    }
+}
+
+.movie-view {
+    height: 100vh;
+    width: 100vw;
+
+    .title {
+        display: flex;
+        height: 20%;
+        width: 100vw;
+        /*border: 2px solid red;*/
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 2rem;
+    }
+
+    .section1 {
+        height: 70%;
+        width: 50%;
+        /*border: 2px solid blue;*/
+        float: left;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        padding: 10px;
+    }
+
+    .section2 {
+        float: right;
+        height: 70%;
+        width: 50%;
+        /*border: 2px solid blue;*/
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        padding: 10px;
+    }
+
+    .button-area {
+        display: float;
+        justify-content: space-evenly;
+
+        button {
+
+        }
+        
     }
 }
