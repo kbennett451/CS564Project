@@ -14,7 +14,7 @@ CREATE TABLE reviewTemp (
 .mode csv
 .import --skip 1 /Users/Griffin/dev/classes/cs564/CS564Project/the-big-picture/database/rotten_tomatoes_critic_reviews.csv reviewTemp
 
-CREATE TABLE review (
+CREATE TABLE Review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     link VARCHAR(255),
     content VARCHAR(2000)
@@ -33,6 +33,7 @@ CREATE TABLE Movie (
     releaseDate DATE, 
     runtime INTEGER, 
     rating INTEGER,
+    count INTEGER,
     link VARCHAR(255)
 );
 
