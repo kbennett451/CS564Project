@@ -43,7 +43,8 @@ const searchResults = document.getElementsByClassName('result');
 /* Reviews */
 const reviewDivs = Array.from(document.getElementsByClassName('review'));
 const closeReview = document.getElementById('close-review');
-//const saveReview = document.getElementById('save-review');
+const saveReview = document.getElementById('save-review');
+const reviewEditor = document.getElementById('review-editor');
 
 /**
  * Function to return from the movie view to the find movie view
@@ -109,6 +110,7 @@ function showSheild() {
     shield.classList.remove('hide');
 }
 
+/* Functions for search view */
 function hideSearchResults() {
     searchResultsDiv.classList.add('hide');
 }
@@ -120,6 +122,17 @@ function showSearchPopup() {
 }
 function hideSearchPopup() {
     searchPopup.classList.add('hide');
+}
+
+/* Functions for review editor */
+function showReviewEditor() {
+    showSheild();
+    reviewEditor.classList.remove('hide');
+}
+
+function hideReviewEditor() {
+    reviewEditor.classList.add('hide');
+    hideShield();
 }
 
 //TODO: reimplement this
@@ -174,6 +187,7 @@ search.addEventListener('click', () => {
     showSearchResults();
 });
 
+/* Add an event listener on each of the search results */
 Array.from(searchResults).forEach((element) => {
     element.addEventListener('click', () => {
         hideSearchResults();
@@ -181,24 +195,13 @@ Array.from(searchResults).forEach((element) => {
     });
 });
 
-const reviewEditor = document.getElementById('review-editor');
-function showViewEditor() {
-    showSheild();
-    //reviewEditor.classList.remove('hide');
-}
-
-function hideViewEditor() {
-    reviewEditor.classList.add('hide');
-    hideShield();
-}
-
+/* Add event listener on each review */
 reviewDivs.forEach((element) => {
     element.addEventListener('click', () => {
-        showViewEditor(element);
+        showReviewEditor(element);
     });
 });
 
-closeReview.addEventListener('click', hideViewEditor);
-saveButton.addEventListener('click', () => {
-    hideViewEditor();
-});
+closeReview.addEventListener('click', hideReviewEditor);
+
+saveReview.addEventListener('click', hideReviewEditor);
