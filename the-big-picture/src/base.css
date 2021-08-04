@@ -1,12 +1,9 @@
-*,
-*::before,
-*::after {
+* {
   font-family: inherit;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   margin: 0px;
   padding: 0px;
-  background-color: azure;
 }
 
 .body {
@@ -43,11 +40,125 @@ button {
   padding: 5px;
 }
 
+.shield {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.search-view {
+  height: 40vh;
+  width: 60vw;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border-radius: 10px;
+  opacity: 1.0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding-top: 35px;
+  z-index: 101;
+  background-color: azure;
+}
+
+#search-results {
+  height: 80vh;
+  width: 40vw;
+  border-radius: 10px;
+  opacity: 1.0;
+  z-index: 101;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding-top: 35px;
+  background-color: azure;
+}
+
+#search-results .result {
+  height: 10%;
+  width: 60%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  background-color: #00adc4;
+  color: aliceblue;
+}
+
+#search-results .result:hover {
+  cursor: pointer;
+}
+
+label {
+  width: 30%;
+  text-align: right;
+  padding-right: 20px;
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+input {
+  margin: 10px;
+  float: right;
+  width: 50%;
+  background-color: white;
+  border-bottom: 1px solid #00adc4;
+}
+
+.selection-container {
+  height: 10%;
+  width: 100%;
+  /*border: 2px solid red;*/
+  text-align: left;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 10px;
+}
+
 .find-a-movie .view-area {
   height: 100vh;
   width: 75vw;
   /*border: 2px solid black;*/
   float: left;
+  background-color: azure;
 }
 
 .find-a-movie .entry-space {
@@ -62,32 +173,6 @@ button {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -ms-flex-pack: distribute;
-      justify-content: space-around;
-}
-
-.find-a-movie .selection-container {
-  height: 10%;
-  width: 100%;
-  /*border: 2px solid red;*/
-  text-align: left;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  padding: 10px;
-}
-
-.find-a-movie label {
-  font-weight: normal;
-  font-size: 1rem;
-}
-
-.find-a-movie input {
-  margin: 10px;
-  float: right;
 }
 
 .find-a-movie .title {
@@ -115,6 +200,7 @@ button {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  background-color: azure;
 }
 
 .find-a-movie .item {
@@ -147,6 +233,7 @@ button {
   -webkit-box-pack: space-evenly;
       -ms-flex-pack: space-evenly;
           justify-content: space-evenly;
+  background-color: azure;
 }
 
 .main-menu span {
@@ -165,6 +252,7 @@ button {
 .movie-view {
   height: 100vh;
   width: 100vw;
+  background-color: azure;
 }
 
 .movie-view .title {
@@ -184,8 +272,22 @@ button {
   font-size: 2rem;
 }
 
-.movie-view .section1 {
+.movie-view .movie-scrollable {
   height: 70%;
+  overflow-y: scroll;
+}
+
+.movie-view .edit-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.movie-view .left-section {
+  height: 80%;
   width: 50%;
   /*border: 2px solid blue;*/
   float: left;
@@ -202,9 +304,9 @@ button {
   padding: 10px;
 }
 
-.movie-view .section2 {
+.movie-view .right-section {
   float: right;
-  height: 70%;
+  height: 80%;
   width: 50%;
   /*border: 2px solid blue;*/
   display: -webkit-box;
@@ -218,6 +320,52 @@ button {
       -ms-flex-pack: space-evenly;
           justify-content: space-evenly;
   padding: 10px;
+}
+
+.movie-view .review-section {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 20%;
+  float: left;
+  width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.movie-view .review-section span {
+  height: 10%;
+  width: 100%;
+  border-bottom: 1px solid grey;
+  font-size: 1.5rem;
+}
+
+.movie-view .review-section .reviews {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.movie-view .review-section .review {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 50px;
+  width: 40%;
+  border: 2px solid red;
+  margin: 15px;
+}
+
+.movie-view .review-section .review:hover {
+  cursor: pointer;
 }
 
 .movie-view .button-area {

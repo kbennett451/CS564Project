@@ -1,11 +1,8 @@
-*,
-*::before,
-*::after {
+* {
     font-family: inherit;
     box-sizing: border-box;
     margin: 0px;
     padding: 0px;
-    background-color: azure;
 }
 
 .body {
@@ -34,6 +31,87 @@ button {
     padding: 5px;
 }
 
+.shield {
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-view {
+    height: 40vh;
+    width: 60vw;
+    align-items: center;
+    border-radius: 10px;
+    opacity: 1.0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 35px;
+    z-index: 101;
+    background-color: azure;
+}
+
+#search-results {
+    height: 80vh;
+    width: 40vw;
+    border-radius: 10px;
+    opacity: 1.0;
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 35px;
+    background-color: azure;
+
+    .result {
+        height: 10%;
+        width: 60%;
+        border-radius: 10px;
+        margin-bottom: 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #00adc4;
+        color: aliceblue;
+    }
+    .result:hover {
+        cursor: pointer;
+    }
+}
+
+label {
+    width: 30%;
+    text-align: right;
+    padding-right: 20px;
+    font-weight: normal;
+    font-size: 1rem;
+}
+input {
+    margin: 10px;
+    float: right;
+
+    width: 50%;
+    background-color: white;
+    border-bottom: 1px solid #00adc4;
+}
+
+.selection-container {
+    height: 10%;
+    width: 100%;
+    /*border: 2px solid red;*/
+    text-align: left;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
 .find-a-movie {
     
     .view-area {
@@ -41,6 +119,7 @@ button {
         width: 75vw;
         /*border: 2px solid black;*/
         float: left;
+        background-color: azure;
     }
     
     .entry-space {
@@ -50,25 +129,6 @@ button {
         /*border: 2px solid blue;*/
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-    }
-    
-    .selection-container {
-        height: 10%;
-        width: 100%;
-        /*border: 2px solid red;*/
-        text-align: left;
-        display: flex;
-        align-items: center;
-        padding: 10px;
-    }
-    label {
-        font-weight: normal;
-        font-size: 1rem;
-    }
-    input {
-        margin: 10px;
-        float: right;
     }
     
     .title {
@@ -88,6 +148,7 @@ button {
         flex-direction: column;
         justify-content: space-around;
         align-items: center;
+        background-color: azure;
     }
     
     .item {
@@ -113,6 +174,7 @@ button {
     align-items: center;
     justify-content: center;
     justify-content: space-evenly;
+    background-color: azure;
 
     span {
         margin: 5px;
@@ -131,6 +193,7 @@ button {
 .movie-view {
     height: 100vh;
     width: 100vw;
+    background-color: azure;
 
     .title {
         display: flex;
@@ -143,8 +206,18 @@ button {
         font-size: 2rem;
     }
 
-    .section1 {
+    .movie-scrollable {
         height: 70%;
+        overflow-y: scroll;
+    }
+
+    .edit-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .left-section {
+        height: 80%;
         width: 50%;
         /*border: 2px solid blue;*/
         float: left;
@@ -154,9 +227,9 @@ button {
         padding: 10px;
     }
 
-    .section2 {
+    .right-section {
         float: right;
-        height: 70%;
+        height: 80%;
         width: 50%;
         /*border: 2px solid blue;*/
         display: flex;
@@ -165,13 +238,41 @@ button {
         padding: 10px;
     }
 
+    .review-section {
+        display: flex;
+        min-height: 20%;
+        float: left;
+        width: 100%;
+        flex-direction: column;
+
+        span {
+            height: 10%;
+            width: 100%;
+            border-bottom: 1px solid grey;
+            font-size: 1.5rem;
+        }
+
+        .reviews {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .review {
+            display: flex;
+            min-height: 50px;
+            width: 40%;
+            border: 2px solid red;
+            margin: 15px;
+        }
+        .review:hover {
+            cursor: pointer;
+        }
+    }
+
     .button-area {
         display: float;
         justify-content: space-evenly;
-
-        button {
-
-        }
         
     }
 }

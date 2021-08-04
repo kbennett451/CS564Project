@@ -14,12 +14,15 @@
 
     <!--Find/Add Movie Content-->
     <div class="find-a-movie hide">
+
       <div class="view-area">
         <p class="title" id="find/add-title">Find a Movie</p>
+
         <div class="entry-space">
+
           <div class="selection-container" id="title-input-container">
             <label for="title">Title:</label>
-            <input type="text" name="title">
+            <input type="text" name="title"> 
           </div>
           <div class="selection-container" id="price-input-container">
             <label for="price">Price:</label>
@@ -41,12 +44,15 @@
           <div class="selection-container" id="actor-input-container">
             <label for="actor">Actor/Actress:</label>
             <input type="text" name="actor" id="">
+            <button id="search-actor">Search</button>
           </div>
           <div class="selection-container" id="director-input-container">
             <label for="director">Director:</label>
             <input type="text" name="director" id="">
+            <button id="search-director">Search</button>
           </div>
         </div> <!--entry space end-->
+
         <div class="submission">
           <button id="back">Back</button>
           <button id="find/add-button">Find</button>
@@ -68,41 +74,86 @@
       <div class="title">
         <span>Movie Title</span>
       </div>
-      <div class="section1">
-        <div>
+      <div class="movie-scrollable">
+      <div class="left-section">
+        <div class="edit-container">
           <label for="director">Director:</label>
           <input class="edit-item hide" type="text" name="director">
         </div>
-        <div>
-
-        </div>
-        <div>
+        <div class="edit-container">
           <ul>Actor / Actress</ul>
         </div>
       </div>
-      <div class="section2"> 
-        <div>
+      <div class="right-section"> 
+        <div class="edit-container">
           <label for="rating">Rating:</label>
           <input class="edit-item hide" type="number" name="rating" id="">
         </div>
-        <div>
+        <div class="edit-container">
           <label for="price">Price:</label>
           <input class="edit-item hide" type="number" name="price" id="">
         </div>
-        <div>
+        <div class="edit-container">
           <label for="runtime">Runtime:</label>
           <input class="edit-item hide" type="time" name="runtime" id="">
         </div>
-        <div>
+        <div class="edit-container">
           <label for="year">Year:</label>
           <input class="edit-item hide" type="number" name="year" id="">
         </div>
       </div>
+    
+      <div class="review-section">
+        <span>Reviews</span>
+        <div class="reviews">
+          <div class="review"></div>
+          <div class="review"></div>
+          <div class="review"></div>
+        </div>
+        
+      </div>
+    </div>
+
       <div class="submission button-area">
         <button id="movie-back">Back</button>
         <button id="edit">Edit</button>
         <button id="save" class="hide">Save</button>
       </div>
+    </div>
+
+
+    <!--Overlays-->
+    <div class="shield hide" id="shield">
+
+      <!--Search Options-->
+      <div class="search-view hide" id="search-view">
+        <h2>Search Actor / Actress</h2>
+        <div class="selection-container">
+          <label for="name">Name: </label>
+          <input type="text" name="name">
+        </div>
+        <div class="search-buttons">
+          <button id="search-cancel">Cancel</button>
+          <button id="search">Search</button>
+        </div>
+      </div>
+
+      <!--Search Results View / Select-->
+      <div id="search-results" class="hide">
+        <div class="result">
+          <span>Griffin Davis</span>
+        </div>
+        <div class="result">
+          <span>Griffin Davis 2</span>
+        </div>
+      </div>
+
+      <!--Edit Review-->
+      <div class="edit-review hide" id="review-editor">
+        <button id="close-review">Close</button>
+        <button id="save-review">Save</button>
+      </div>
+    </div>
     </div>
   </body>
   <script src='./rerender.js'></script>
