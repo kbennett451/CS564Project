@@ -1,3 +1,32 @@
+const sqlite3 = require('sqlite3').verbose();
+
+function queryDatabase(query) {
+    const db = new sqlite3.Database('./database/theBigPicture.db', sqlite3.OPEN_READONLY, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Connected to the  database.');
+    });
+
+    console.log(query);
+
+    db.serialize(() => {
+        db.each(query, (err, row) => {
+            if (err) {
+                console.error(err.message);
+            }
+            console.log(row);
+        });
+    });
+
+    db.close((err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Close the database connection.');
+    });
+}
+
 /* Main Menu View */
 const mainMenuDiv = document.getElementsByClassName('main-menu')[0];
 const findMovieButton = document.getElementById('find-a-movie-button');
@@ -138,6 +167,7 @@ function hideReviewEditor() {
 //TODO: reimplement this
 findAddbutton.addEventListener('click', () => {
     findMovieDiv.classList.add('hide');
+    queryDatabase('SELECT * FROM Movie WHERE id<10');
     movieView.classList.remove('hide');
 });
 
@@ -205,3 +235,4 @@ reviewDivs.forEach((element) => {
 closeReview.addEventListener('click', hideReviewEditor);
 
 saveReview.addEventListener('click', hideReviewEditor);
+
