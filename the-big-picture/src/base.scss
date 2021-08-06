@@ -43,6 +43,11 @@ button {
     align-items: center;
 }
 
+#actor-list {
+    overflow-y: scroll;
+    width: 100%;
+}
+
 .search-view {
     height: 40vh;
     width: 60vw;
@@ -68,9 +73,10 @@ button {
     align-items: center;
     padding-top: 35px;
     background-color: azure;
+    overflow-y: scroll;
 
     .result {
-        height: 10%;
+        min-height: 50px;
         width: 60%;
         border-radius: 10px;
         margin-bottom: 10px;
@@ -214,6 +220,21 @@ input {
     .edit-container {
         display: flex;
         align-items: center;
+    }
+
+    #info {
+        min-height: 100px;
+        width: 100%;
+    }
+    #label-for-info {
+        text-align: center;
+    }
+    .info-container {
+        flex-direction: column;
+    }
+
+    .actors-container {
+        flex-direction: column;
     }
 
     .left-section {

@@ -58,6 +58,11 @@ button {
           align-items: center;
 }
 
+#actor-list {
+  overflow-y: scroll;
+  width: 100%;
+}
+
 .search-view {
   height: 40vh;
   width: 60vw;
@@ -99,10 +104,11 @@ button {
           align-items: center;
   padding-top: 35px;
   background-color: azure;
+  overflow-y: scroll;
 }
 
 #search-results .result {
-  height: 10%;
+  min-height: 50px;
   width: 60%;
   border-radius: 10px;
   margin-bottom: 10px;
@@ -284,6 +290,29 @@ input {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+}
+
+.movie-view #info {
+  min-height: 100px;
+  width: 100%;
+}
+
+.movie-view #label-for-info {
+  text-align: center;
+}
+
+.movie-view .info-container {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.movie-view .actors-container {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 
 .movie-view .left-section {
