@@ -1,6 +1,10 @@
 /* eslint-disable eqeqeq */
 const sqlite3 = require('sqlite3').verbose();
 
+/**
+ * TODO: likely delete this, mostly for testing
+ * @param {SQL} query - SQL String
+ */
 function queryDatabase(query) {
     const db = new sqlite3.Database('./database/theBigPicture.db', sqlite3.OPEN_READONLY, (err) => {
         if (err) {
@@ -222,7 +226,7 @@ function getSearchCriteria() {
             break;
         default:
         }
-    });
+    }); //TODO: make sure searchCriteria gets reset
 }
 
 /**
@@ -274,19 +278,33 @@ function generateMovieResultTemplate(movie) {
             </div>`;
 }
 
+//TODO: implement adding reviews
 function addReviews(movie) {
 
 }
 
+/**
+ * Generates a html element for actor
+ * @param {object} actor - name and id
+ * @returns html string
+ */
 function generateActorListItem(actor) {
-    return `<li contenteditable="false" data-id=${actor.id}>${actor.name}</li>`
+    return `<li contenteditable="false" data-id=${actor.id}>${actor.name}</li>`;
 }
 
+/**
+ * Adds the actor to the actor-list
+ * @param {object} actor - the actor to add
+ */
 function addActor(actor) {
     const child = htmlToElement(generateActorListItem(actor));
     document.getElementById('actor-list').appendChild(child);
 }
 
+/**
+ * Queries the actors based on a movie and adds them to the DOM
+ * @param {int} movieID - movie ID
+ */
 function queryActorsFromMovie(movieID) {
     const query = `SELECT Actor.name, Actor.id
                     FROM StarsIn
@@ -295,17 +313,31 @@ function queryActorsFromMovie(movieID) {
     callbackOnDatabase(query, addActor);
 }
 
+/**
+ * Adds the director's name to the input field
+ * @param {object} director - the director to add
+ */
 function addDirector(director) {
+    //TODO: figure out how to update when this changes
+    //probably should have ID here to remove it from directs on change
     document.getElementById('director-movie-view').value = director.name;
 }
 
+/**
+ * Queries the director given a movie's ID
+ * @param {int} movieID - the movie's ID
+ */
 function queryDirectorFromMovie(movieID) {
     const query = `SELECT Director.name FROM Directs
                     INNER JOIN Director ON Director.id = dID
                     WHERE mID = ${movieID}`;
-    callbackOnDatabase(query, addDirector);
+    callbackOnDatabase(query, addDirector); // TODO: consider multiple directors
 }
 
+/**
+ * Configures the movie view based on the content returned from the query
+ * @param {object} movie - movie object
+ */
 function setMovieViewContent(movie) {
     // data from initial query
     document.getElementById('movie-title').innerText = movie.title;
@@ -313,15 +345,21 @@ function setMovieViewContent(movie) {
     document.getElementById('runtime').value = movie.runtime;
     document.getElementById('releaseDate-movie').value = `${movie.releaseDate}`;
     document.getElementById('info').value = movie.info;
-    
+
     // get directors
     queryDirectorFromMovie(movie.id);
+
     // get actors/actresses
     queryActorsFromMovie(movie.id);
+
     // get reviews'
     addReviews(movie);
 }
 
+/**
+ * Adds movie results to the results view for the user to choose
+ * @param {object} movie - movie object
+ */
 function addMovieResults(movie) {
     const child = htmlToElement(generateMovieResultTemplate(movie)); // create element
 
