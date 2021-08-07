@@ -61,6 +61,7 @@ button {
 #actor-list {
   overflow-y: scroll;
   width: 100%;
+  max-height: 25vh;
 }
 
 .search-view {
@@ -265,7 +266,7 @@ input {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: 20%;
+  height: 10%;
   width: 100vw;
   /*border: 2px solid red;*/
   -webkit-box-align: center;
@@ -279,7 +280,7 @@ input {
 }
 
 .movie-view .movie-scrollable {
-  height: 70%;
+  height: 80%;
   overflow-y: scroll;
 }
 
@@ -293,7 +294,7 @@ input {
 }
 
 .movie-view #info {
-  min-height: 100px;
+  min-height: 60;
   width: 100%;
 }
 
@@ -389,8 +390,16 @@ input {
   display: flex;
   min-height: 50px;
   width: 40%;
-  border: 2px solid red;
   margin: 15px;
+  font-size: .9rem;
+  padding: 5px;
+  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+  background-color: #00adc4;
+  border-radius: 10px;
+  color: aliceblue;
 }
 
 .movie-view .review-section .review:hover {
@@ -419,9 +428,6 @@ input {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
   padding-top: 35px;
   z-index: 101;
   background-color: azure;
@@ -429,7 +435,11 @@ input {
 
 .edit-review .content-area {
   height: 30vh;
-  width: 60vw;
+  width: 100%;
   padding: 10px;
+}
+
+.edit-review .content-area textarea {
+  width: 100%;
 }
 /*# sourceMappingURL=base.css.map */

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */ //TODO: probably remove this
 /* eslint-disable eqeqeq */
 const sqlite3 = require('sqlite3').verbose();
 
@@ -102,7 +103,6 @@ const searchResultsDiv = document.getElementById('search-results');
 //const searchResults = document.getElementsByClassName('result');
 
 /* Reviews */
-const reviewDivs = Array.from(document.getElementsByClassName('review'));
 const closeReview = document.getElementById('close-review');
 const saveReview = document.getElementById('save-review');
 const reviewEditor = document.getElementById('review-editor');
@@ -190,6 +190,11 @@ function hideSearchPopup() {
 function showReviewEditor() {
     showSheild();
     reviewEditor.classList.remove('hide');
+    console.log(this);
+    const query = `SELECT Review.content FROM Review WHERE review.id = ${this.dataset.id}`;
+    callbackOnDatabase(query, (review) => {
+        document.getElementById('review-content').value = review.content;
+    });
 }
 
 function hideReviewEditor() {
@@ -226,7 +231,7 @@ function getSearchCriteria() {
             break;
         default:
         }
-    }); //TODO: make sure searchCriteria gets reset
+    });
 }
 
 /**
@@ -238,7 +243,12 @@ function parseMovieCriteria() {
     let whereClause = '';
     if (searchCriteria.title != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
-        whereClause += ` Movie.title LIKE '%${searchCriteria.title}%'`;
+        if (searchCriteria.title.length < 3) {
+            whereClause += ` Movie.title LIKE '${searchCriteria.title}%'`;
+        }
+        else {
+            whereClause += ` Movie.title LIKE '%${searchCriteria.title}%'`;
+        }
     }
     if (searchCriteria.releaseDate != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
@@ -278,9 +288,20 @@ function generateMovieResultTemplate(movie) {
             </div>`;
 }
 
+function generateReviewTemplate(review) {
+    return `<div class="review" data-id=${review.id}>${review.content}</div>`;
+}
+
+function addIndividualReview(review) {
+    const child = htmlToElement(generateReviewTemplate(review));
+    child.addEventListener('click', showReviewEditor);
+    document.getElementById('review-list').appendChild(child);
+}
+
 //TODO: implement adding reviews
 function addReviews(movie) {
-
+    const query = `SELECT review.id, review.content FROM review INNER JOIN Describes on review.id = rID where mID = ${movie.id} LIMIT 100`;
+    callbackOnDatabase(query, addIndividualReview);
 }
 
 /**
@@ -467,7 +488,7 @@ function addDirectorResult(row) {
 
 
 /* Bind find button */
-// TODO: fix Add
+// TODO: This is for find, need to do the same for add
 findAddbutton.addEventListener('click', () => {
     getSearchCriteria();
     callbackOnDatabase(parseMovieCriteria(), addMovieResults);
@@ -496,7 +517,7 @@ searchActor.addEventListener('click', () => {
     showSheild();
     const val = document.getElementById('actor').value;
     if (val != '') {
-        callbackOnDatabase(queryActor(name), addActorResult);
+        callbackOnDatabase(queryActor(val), addActorResult);
         showSearchResults();
     }
     else {
@@ -533,13 +554,6 @@ document.getElementById('actor').addEventListener('input', (e) => {
     }
 });
 
-/* Add event listener on each review */
-reviewDivs.forEach((element) => {
-    element.addEventListener('click', () => {
-        showReviewEditor(element);
-    });
-});
-
 closeReview.addEventListener('click', hideReviewEditor);
 
 saveReview.addEventListener('click', hideReviewEditor);
@@ -547,6 +561,18 @@ saveReview.addEventListener('click', hideReviewEditor);
 /* Event Listners */
 movieBack.addEventListener('click', () => {
     returnToFindMovie();
+
+    // remove list of actors
+    const actorList = document.getElementById('actor-list');
+    while (actorList.firstChild != null) {
+        actorList.firstChild.remove();
+    }
+
+    // remove list of reviews
+    const reviewList = document.getElementById('review-list');
+    while (reviewList.firstChild != null) {
+        reviewList.firstChild.remove();
+    }
 });
 
 findMovieButton.addEventListener('click', () => {
@@ -569,5 +595,4 @@ saveButton.addEventListener('click', () => {
 searchCancel.addEventListener('click', () => {
     hideShield();
     hideSearchPopup();
-    //TODO: handle hiding the search box as well
 });

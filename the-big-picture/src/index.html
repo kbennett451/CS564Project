@@ -104,10 +104,7 @@
     
       <div class="review-section">
         <span>Reviews</span>
-        <div class="reviews">
-          <div class="review"></div>
-          <div class="review"></div>
-          <div class="review"></div>
+        <div class="reviews" id="review-list">
         </div>
         
       </div>
@@ -145,7 +142,9 @@
       <!--Edit Review-->
       <div class="edit-review hide" id="review-editor">
         <div class="content-area">
-          This is the text
+          <textarea class="edit-item" name="info" id="review-content" cols="50" rows="10">
+            Text
+          </textarea>
         </div>
         <div class="button-area">
           <button id="close-review">Close</button>
