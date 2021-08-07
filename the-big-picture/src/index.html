@@ -13,7 +13,7 @@
     </div>
 
     <!--Find/Add Movie Content-->
-    <div class="find-a-movie hide">
+    <div class="find-a-movie hide" id="find-a-movie">
 
       <div class="view-area">
         <p class="title" id="find/add-title">Find a Movie</p>
@@ -40,12 +40,12 @@
         
           <div class="selection-container" id="actor-input-container">
             <label for="actor">Actor/Actress:</label>
-            <input type="text" name="actor" id="actor">
+            <input type="text" name="actor" id="actor" class="criteria">
             <button id="search-actor">Find Actor</button>
           </div>
           <div class="selection-container" id="director-input-container">
             <label for="director">Director:</label>
-            <input type="text" name="director" id="director">
+            <input type="text" name="director" id="director" class="criteria">
             <button id="search-director">Find Director</button>
           </div>
         </div> <!--entry space end-->
@@ -112,8 +112,10 @@
 
       <div class="submission button-area">
         <button id="movie-back">Back</button>
+        <button id="add-movie-review">Add Review</button>
         <button id="edit">Edit</button>
         <button id="save" class="hide">Save</button>
+        <button id="delete-movie">Delete</button>
       </div>
     </div>
 
@@ -142,9 +144,7 @@
       <!--Edit Review-->
       <div class="edit-review hide" id="review-editor">
         <div class="content-area">
-          <textarea class="edit-item" name="info" id="review-content" cols="50" rows="10">
-            Text
-          </textarea>
+          <textarea class="edit-item" name="info" id="review-content" cols="50" rows="10" data-edit = "false"></textarea>
         </div>
         <div class="button-area">
           <button id="close-review">Close</button>

@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable no-console */ //TODO: probably remove this
 /* eslint-disable eqeqeq */
 const sqlite3 = require('sqlite3').verbose();
@@ -7,7 +8,7 @@ const sqlite3 = require('sqlite3').verbose();
  * @param {SQL} query - SQL String
  */
 function queryDatabase(query) {
-    const db = new sqlite3.Database('./database/theBigPicture.db', sqlite3.OPEN_READONLY, (err) => {
+    const db = new sqlite3.Database('./database/theBigPicture.db', sqlite3.OPEN_READWRITE, (err) => {
         if (err) {
             console.error(err.message);
         }
@@ -33,14 +34,19 @@ function queryDatabase(query) {
     });
 }
 
-function callbackOnDatabase(query, callback) {
-    const db = new sqlite3.Database('./database/theBigPicture.db', sqlite3.OPEN_READONLY, (err) => {
+/**
+ * Exectues a callback on the database
+ * If insert == true, callback is at the end, otherwise it is on each row.
+ */
+function callbackOnDatabase(query, callback, insert) {
+    const db = new sqlite3.Database('./database/theBigPicture.db', sqlite3.OPEN_READWRITE, (err) => {
         if (err) {
             console.error(err.message);
         }
         console.log('Connected to the  database.');
     });
 
+    //TODO: delete
     console.log(query);
 
     db.serialize(() => {
@@ -58,6 +64,10 @@ function callbackOnDatabase(query, callback) {
         }
         console.log('Close the database connection.');
     });
+
+    if (insert) {
+        callback();
+    }
 }
 
 /* Main Menu View */
@@ -191,25 +201,36 @@ function showReviewEditor() {
     showSheild();
     reviewEditor.classList.remove('hide');
     console.log(this);
-    const query = `SELECT Review.content FROM Review WHERE review.id = ${this.dataset.id}`;
+    const query = `SELECT Review.id, Review.content FROM Review WHERE review.id = ${this.dataset.id}`;
     callbackOnDatabase(query, (review) => {
         document.getElementById('review-content').value = review.content;
+        document.getElementById('review-content').dataset.id = review.id;
     });
 }
 
+/**
+ * Hides the review editor and performs teardown actions
+ */
 function hideReviewEditor() {
     reviewEditor.classList.add('hide');
+    document.getElementById('review-content').value = '';
+    document.getElementById('review-content').removeAttribute('data-id');
+    document.getElementById('review-content').removeAttribute('data-edited');
     hideShield();
 }
 
 /**
- * Reusable object for the search criteria of a query
+ * Reusable object for the criteria of a query
  */
-const searchCriteria = {
+const criteria = {
     title: '',
     releaseDate: '',
     runtime: '',
     rating: '',
+    actorName: '',
+    actorId: '',
+    dirctorName: '',
+    directorId: '',
 };
 /**
  * Function to take input criteria and convert to an object
@@ -218,16 +239,36 @@ function getSearchCriteria() {
     Array.from(document.getElementsByClassName('criteria')).forEach((element) => {
         switch (element.name) {
         case 'title':
-            searchCriteria.title = element.value;
+            criteria.title = element.value;
             break;
         case 'releaseDate':
-            searchCriteria.releaseDate = element.value;
+            criteria.releaseDate = element.value;
             break;
         case 'runtime':
-            searchCriteria.runtime = element.value;
+            criteria.runtime = element.value;
             break;
         case 'rating':
-            searchCriteria.rating = element.value;
+            criteria.rating = element.value;
+            break;
+        case 'actor':
+            if (element.hasAttribute('data-id')) {
+                criteria.actorId = element.dataset.id;
+                criteria.actorName = '';
+            }
+            else {
+                criteria.actorId = '';
+                criteria.actorName = element.value;
+            }
+            break;
+        case 'director':
+            if (element.hasAttribute('data-id')) {
+                criteria.directorId = element.dataset.id;
+                criteria.dirctorName = '';
+            }
+            else {
+                criteria.directorId = '';
+                criteria.directorName = element.value;
+            }
             break;
         default:
         }
@@ -241,26 +282,26 @@ function getSearchCriteria() {
 function parseMovieCriteria() {
     let query = 'SELECT id, title, releaseDate, rating, runtime, info FROM Movie';
     let whereClause = '';
-    if (searchCriteria.title != '') {
+    if (criteria.title != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
-        if (searchCriteria.title.length < 3) {
-            whereClause += ` Movie.title LIKE '${searchCriteria.title}%'`;
+        if (criteria.title.length < 3) {
+            whereClause += ` Movie.title LIKE '${criteria.title}%'`;
         }
         else {
-            whereClause += ` Movie.title LIKE '%${searchCriteria.title}%'`;
+            whereClause += ` Movie.title LIKE '%${criteria.title}%'`;
         }
     }
-    if (searchCriteria.releaseDate != '') {
+    if (criteria.releaseDate != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
-        whereClause += ` Movie.releaseDate = "${searchCriteria.releaseDate}"`;
+        whereClause += ` Movie.releaseDate = "${criteria.releaseDate}"`;
     }
-    if (searchCriteria.runtime != '') {
+    if (criteria.runtime != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
-        whereClause += ` Movie.runtime = ${searchCriteria.runtime}`;
+        whereClause += ` Movie.runtime = ${criteria.runtime}`;
     }
-    if (searchCriteria.rating != '') {
+    if (criteria.rating != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
-        whereClause += ` Movie.rating = ${searchCriteria.rating}`;
+        whereClause += ` Movie.rating = ${criteria.rating}`;
     }
     const res = (whereClause != '') ? query += whereClause : query;
     return res;
@@ -289,7 +330,7 @@ function generateMovieResultTemplate(movie) {
 }
 
 function generateReviewTemplate(review) {
-    return `<div class="review" data-id=${review.id}>${review.content}</div>`;
+    return `<div class="review" data-id=${review.id} id="review-${review.id}">${review.content}</div>`;
 }
 
 function addIndividualReview(review) {
@@ -298,7 +339,10 @@ function addIndividualReview(review) {
     document.getElementById('review-list').appendChild(child);
 }
 
-//TODO: implement adding reviews
+/**
+ * Adds the reviews to the screen
+ * @param {movie object} movie - movie to find reviews for
+ */
 function addReviews(movie) {
     const query = `SELECT review.id, review.content FROM review INNER JOIN Describes on review.id = rID where mID = ${movie.id} LIMIT 100`;
     callbackOnDatabase(query, addIndividualReview);
@@ -366,6 +410,7 @@ function setMovieViewContent(movie) {
     document.getElementById('runtime').value = movie.runtime;
     document.getElementById('releaseDate-movie').value = `${movie.releaseDate}`;
     document.getElementById('info').value = movie.info;
+    document.getElementById('movie-view').dataset.id = movie.id;
 
     // get directors
     queryDirectorFromMovie(movie.id);
@@ -486,14 +531,50 @@ function addDirectorResult(row) {
     searchResultsDiv.appendChild(child); // finally add this to the div
 }
 
+/**
+ * Adds the new movie to the database
+ */
+function addMovieToDatabase() { //TODO: actually file to the database
+    getSearchCriteria();
+    console.log('Adding Movie');
+    console.log(criteria);
+}
+
+/**
+ * Validates the add criteria for a movie
+ * @returns the text for an alert message, no text means we're good
+ */
+// TODO: add more criteria
+function validateAddMovieCriteria() {
+    let text = '';
+    getSearchCriteria();
+    if (criteria.title == '') {
+        text += 'Missing A Title \n';
+    }
+    return text;
+}
+
 
 /* Bind find button */
 // TODO: This is for find, need to do the same for add
 findAddbutton.addEventListener('click', () => {
-    getSearchCriteria();
-    callbackOnDatabase(parseMovieCriteria(), addMovieResults);
-    showSheild();
-    showSearchResults();
+    switch (document.getElementById('find-a-movie').dataset.type) {
+    case 'add':
+        const text = validateAddMovieCriteria();
+        if (text == '') {
+            addMovieToDatabase();
+        }
+        else {
+            alert(text);
+        }
+        break;
+    default:
+        getSearchCriteria();
+        callbackOnDatabase(parseMovieCriteria(), addMovieResults);
+        showSheild();
+        showSearchResults();
+        break;
+    }
 });
 
 /* Bind the search button for Actor/Director search */
@@ -543,23 +624,85 @@ searchDirector.addEventListener('click', () => {
 // Cleanup the id if the user changes the name of the director
 document.getElementById('director').addEventListener('input', (e) => {
     if (e.target.dataset.id != null) {
-        e.target.dataset.id = null; // if the user changes the value, don't keep the ID
+        e.target.dataset.removeAttribute('data-id'); // if the user changes the value, don't keep the ID
     }
 });
 
 // Cleanup the id if the user changes the name of the actor
 document.getElementById('actor').addEventListener('input', (e) => {
     if (e.target.dataset.id != null) {
-        e.target.dataset.id = null; // if the user changes the value, don't keep the ID
+        e.target.removeAttribute('data-id'); // if the user changes the value, don't keep the ID
     }
 });
 
+/* Bind the close button */
 closeReview.addEventListener('click', hideReviewEditor);
 
-saveReview.addEventListener('click', hideReviewEditor);
+/**
+ * Handle updating a review as a callback from the database
+ */
+function handleReviewUpdates() {
+    const searchContent = document.getElementById('review-content').value;
+    const query = `SELECT id FROM Review WHERE content = "${searchContent}"`;
 
-/* Event Listners */
-movieBack.addEventListener('click', () => {
+    callbackOnDatabase(query, (review) => { // second callback since insert has a poor callback function
+        // add to the describes database
+        const movieID = document.getElementById('movie-view').dataset.id;
+        callbackOnDatabase(`INSERT INTO Describes (mID, rID) VALUES (${movieID}, ${review.id})`, () => {
+
+        }, true);
+
+        // update the review ID on the view
+        document.getElementById('xxx').dataset.id = review.id;
+        document.getElementById('xxx').id = `review-${review.id}`;
+    });
+}
+
+/**
+ * Adds the new review to the database and updates the view
+ * @param {review object} review - object holding review contents
+ */
+function commitNewReviewToDatabase(review) {
+    const insertQuery = `INSERT INTO Review (content) VALUES ("${review.content}")`;
+    callbackOnDatabase(insertQuery, () => {
+
+    }, true);
+    setTimeout(() => {
+    // unfortunately sqlite 3.2 doesn't support return from an insert so let's just add a delay here
+        handleReviewUpdates();
+    }, 3000);
+}
+
+/**
+ * Saves the content of the review
+ */
+function saveReviewContent() {
+    const review = document.getElementById('review-content');
+    if (review.hasAttribute('data-id')) { // is existing review
+        if (review.dataset.edit == 'true') { // update the review
+            const query = `UPDATE Review SET content = "${review.value}" WHERE id = ${review.dataset.id}`;
+            queryDatabase(query);
+
+            // make it so we can get the element easily with an id
+            document.getElementById(`review-${review.dataset.id}`).innerText = review.value; 
+        }
+    }
+    else { // new review
+        // using 'xxx' here so that we can easily find it in the callback
+        const content = { id: 'xxx', content: review.value };
+        addIndividualReview(content);
+        commitNewReviewToDatabase(content);
+    }
+    hideReviewEditor();
+}
+
+/* Bind the save button */
+saveReview.addEventListener('click', saveReviewContent);
+
+/**
+ * Clean up the movie view so things don't bleed through to new searches
+ */
+function cleanupMovieView() {
     returnToFindMovie();
 
     // remove list of actors
@@ -573,20 +716,32 @@ movieBack.addEventListener('click', () => {
     while (reviewList.firstChild != null) {
         reviewList.firstChild.remove();
     }
-});
+
+    document.getElementById('movie-view').removeAttribute('data-id');
+}
+/* Event Listners */
+movieBack.addEventListener('click', cleanupMovieView);
 
 findMovieButton.addEventListener('click', () => {
     showFindMovie();
+
+    // make sure the type is find so we know what we're doing on save/edit
+    document.getElementById('find-a-movie').dataset.type = 'find';
 });
 
 addMovieButton.addEventListener('click', () => {
     showAddMovie();
+
+    // make sure the type is add so we know what to do on save
+    document.getElementById('find-a-movie').dataset.type = 'add';
 });
 
+/* Bind edit button to toggle editable items */
 edit.addEventListener('click', () => {
     enableEditableItems();
 });
 
+/* Bind save button to disable editable items */
 saveButton.addEventListener('click', () => {
     //TODO: determine what needs to be saved
     disableEditableItems();
@@ -595,4 +750,33 @@ saveButton.addEventListener('click', () => {
 searchCancel.addEventListener('click', () => {
     hideShield();
     hideSearchPopup();
+});
+
+//TODO: implement SQL query to delete
+function deleteMovie() {
+    const id = document.getElementById('movie-view').dataset.id;
+    console.log(`Delete ${id}`);
+    cleanupMovieView();
+}
+
+/* Bind delete button */
+document.getElementById('delete-movie').addEventListener('click', deleteMovie);
+
+/**
+ * Shows the new review editor to add a review
+ */
+function newReviewEditor() {
+    showSheild();
+    reviewEditor.classList.remove('hide');
+    document.getElementById('review-content').removeAttribute('data-id');
+}
+
+/* Binds the add review button */
+document.getElementById('add-movie-review').addEventListener('click', newReviewEditor);
+
+// setup the editor so that we can track changes
+document.getElementById('review-content').addEventListener('input', (e) => {
+    if (e.target.dataset.edit != null) {
+        e.target.dataset.edit = true;
+    }
 });
