@@ -75,7 +75,7 @@
       <div class="left-section">
         <div class="edit-container info-container">
           <label id="label-for-info" for="info">Details</label>
-          <textarea class="edit-item" name="info" id="info" cols="50" rows="10"></textarea>
+          <textarea class="edit-item" name="info" id="info" cols="50" rows="10" readonly></textarea>
         </div>
         <div class="edit-container actors-container">
           <h3>Actor / Actress</h3>
@@ -96,23 +96,26 @@
           <label for="releaseDate">Release Date:</label>
           <input class="edit-item" type="date" name="releaseDate" id="releaseDate-movie" readonly>
         </div>
-        <div class="edit-container">
-          <label for="director">Director:</label>
-          <input class="edit-item" type="text" name="director" id="director-movie-view" readonly>
+        <div class="edit-container director-container">
+          <h3>Director</h3>
+          <ul id="director-list">
+
+          </ul>
         </div>
       </div>
     
       <div class="review-section">
-        <span>Reviews</span>
-        <div class="reviews" id="review-list">
-        </div>
-        
+        <h3>Reviews</h3>
+          <div class="reviews" id="review-list">
+          </div>    
       </div>
     </div>
 
       <div class="submission button-area">
         <button id="movie-back">Back</button>
         <button id="add-movie-review">Add Review</button>
+        <button id="add-actor">Add Actor</button>
+        <button id="add-director">Add Director</button>
         <button id="edit">Edit</button>
         <button id="save" class="hide">Save</button>
         <button id="delete-movie">Delete</button>
@@ -137,8 +140,13 @@
       </div>
 
       <!--Search Results View / Select-->
-      <div class="hide" id="search-results">
-        
+      <div class="hide" id="search-res-container">
+        <div class="header">
+          <button id="cancel-results">Cancel</button>
+        </div>
+        <div id="search-results">
+
+        </div>
       </div>
 
       <!--Edit Review-->

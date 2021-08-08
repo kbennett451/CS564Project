@@ -1,7 +1,11 @@
+/* eslint-disable no-alert */
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-console */ //TODO: probably remove this
 /* eslint-disable eqeqeq */
 const sqlite3 = require('sqlite3').verbose();
+
+let nextActorId;
+let nextDirectorId;
 
 /**
  * TODO: likely delete this, mostly for testing
@@ -70,6 +74,22 @@ function callbackOnDatabase(query, callback, insert) {
     }
 }
 
+function getNextActorID() {
+    const query = 'SELECT id FROM Actor ORDER BY id desc LIMIT 1';
+    callbackOnDatabase(query, (row) => {
+        nextActorId = row.id + 1;
+    });
+}
+
+function getNextDirectorID() {
+    const query = 'SELECT id FROM Director ORDER BY id desc LIMIT 1';
+    callbackOnDatabase(query, (row) => {
+        nextDirectorId = row.id + 1;
+    });
+}
+getNextActorID();
+getNextDirectorID();
+
 /* Main Menu View */
 const mainMenuDiv = document.getElementsByClassName('main-menu')[0];
 const findMovieButton = document.getElementById('find-a-movie-button');
@@ -96,6 +116,7 @@ const shield = document.getElementById('shield');
 const backButton = document.getElementById('back');
 
 backButton.addEventListener('click', () => {
+    cleanupMovieView();
     movieView.classList.add('hide');
     findMovieDiv.classList.add('hide');
     mainMenuDiv.classList.remove('hide');
@@ -152,6 +173,9 @@ function enableEditableItems() {
     for (let i = 0; i < editableItems.length; i++) {
         editableItems[i].readOnly = false;
     }
+    Array.from(document.getElementsByClassName('edit-list')).forEach((element) => {
+        element.setAttribute('contenteditable', true);
+    });
     saveButton.classList.remove('hide');
     edit.classList.add('hide');
 }
@@ -163,6 +187,9 @@ function disableEditableItems() {
     for (let i = 0; i < editableItems.length; i++) {
         editableItems[i].readOnly = true;
     }
+    Array.from(document.getElementsByClassName('edit-list')).forEach((element) => {
+        element.setAttribute('contenteditable', false);
+    });
     saveButton.classList.add('hide');
     edit.classList.remove('hide');
 }
@@ -183,10 +210,10 @@ function showSheild() {
 
 /* Functions for search view */
 function hideSearchResults() {
-    searchResultsDiv.classList.add('hide');
+    document.getElementById('search-res-container').classList.add('hide');
 }
 function showSearchResults() {
-    searchResultsDiv.classList.remove('hide');
+    document.getElementById('search-res-container').classList.remove('hide');
 }
 function showSearchPopup(type) {
     searchPopup.firstElementChild.innerText = (type == 'actor') ? 'Search Actor / Actress' : 'Search Director';
@@ -349,21 +376,51 @@ function addReviews(movie) {
 }
 
 /**
- * Generates a html element for actor
- * @param {object} actor - name and id
+ * Generates a html element for actor or director
+ * @param {object} record - name and id
  * @returns html string
  */
-function generateActorListItem(actor) {
-    return `<li contenteditable="false" data-id=${actor.id}>${actor.name}</li>`;
+function generateActorListItem(record, type) {
+    return `<li contenteditable="false" class="edit-list" data-id=${record.id} data-type="${type}">${record.name}</li>`;
 }
+
+function displayContentEditableResults(searchName, type) {
+    showSheild();
+    showSearchResults();
+    // eslint-disable-next-line no-use-before-define
+    populateActorDirectorResults(searchName, type);
+}
+
+// eslint-disable-next-line no-unused-vars
+let activeContentEditableItem = null;
 
 /**
  * Adds the actor to the actor-list
  * @param {object} actor - the actor to add
  */
 function addActor(actor) {
-    const child = htmlToElement(generateActorListItem(actor));
+    const child = htmlToElement(generateActorListItem(actor, 'actor'));
+    child.addEventListener('focusout', (e) => {
+        activeContentEditableItem = e.target;
+        displayContentEditableResults(e.target.innerText, 'actor');
+    });
+    child.addEventListener('keypress', (e) => {
+        if (e.which == '13') {
+            activeContentEditableItem = e.target;
+            console.log(activeContentEditableItem);
+            e.preventDefault();
+            displayContentEditableResults(e.target.innerText, 'actor');
+        }
+    });
+    child.addEventListener('contextmenu', (e) => {
+        if (confirm(`Delete ${e.target.innerText}?`)) {
+            const starsInQuery = `DELETE FROM StarsIn WHERE aID = ${e.target.dataset.id} AND mID = ${document.getElementById('movie-view').dataset.id}`;
+            e.target.remove();
+            queryDatabase(starsInQuery);
+        }
+    });
     document.getElementById('actor-list').appendChild(child);
+    return child;
 }
 
 /**
@@ -379,13 +436,33 @@ function queryActorsFromMovie(movieID) {
 }
 
 /**
- * Adds the director's name to the input field
+ * Adds the director's name to the director list
  * @param {object} director - the director to add
  */
 function addDirector(director) {
     //TODO: figure out how to update when this changes
     //probably should have ID here to remove it from directs on change
-    document.getElementById('director-movie-view').value = director.name;
+
+    const child = htmlToElement(generateActorListItem(director, 'director'));
+    child.addEventListener('focusout', (e) => {
+        activeContentEditableItem = e.target;
+        displayContentEditableResults(e.target.innerText, 'director');
+    });
+    child.addEventListener('keypress', (e) => {
+        if (e.which == '13') {
+            activeContentEditableItem = e.target;
+            e.preventDefault();
+            displayContentEditableResults(e.target.innerText, 'director');
+        }
+    });
+    child.addEventListener('contextmenu', (e) => {
+        if (confirm(`Delete ${e.target.innerText}?`)) {
+            const directsQuery = `DELETE FROM Directs WHERE dID = ${e.target.dataset.id} AND mID = ${document.getElementById('movie-view').dataset.id}`;
+            e.target.remove();
+            queryDatabase(directsQuery);
+        }
+    });
+    document.getElementById('director-list').appendChild(child);
 }
 
 /**
@@ -393,7 +470,7 @@ function addDirector(director) {
  * @param {int} movieID - the movie's ID
  */
 function queryDirectorFromMovie(movieID) {
-    const query = `SELECT Director.name FROM Directs
+    const query = `SELECT Director.name, Director.id FROM Directs
                     INNER JOIN Director ON Director.id = dID
                     WHERE mID = ${movieID}`;
     callbackOnDatabase(query, addDirector); // TODO: consider multiple directors
@@ -491,9 +568,26 @@ function addActorResult(row) {
             element.remove();
         });
 
-        // set the value in the find view
-        const inputNode = document.getElementById('actor');
-        if (inputNode != null) {
+        if (document.getElementById('movie-view').hasAttribute('data-id') == true) {
+            if (activeContentEditableItem != null && activeContentEditableItem.hasAttribute('data-id') && activeContentEditableItem.dataset.id != row.id) {
+                activeContentEditableItem.dataset.edit = true;
+                if (activeContentEditableItem.hasAttribute('data-removed') == false) {
+                    activeContentEditableItem.dataset.removed = activeContentEditableItem.dataset.id;
+                }
+            }
+            else { // new actor
+                activeContentEditableItem = addActor(row);
+                const actorQuery = `INSERT INTO Actor (id, name) VALUES (${row.id}, "${row.name}")`;
+                const StarsInQuery = `INSERT INTO StarsIn (aID, mID) VALUES (${nextActorId}, ${document.getElementById('movie-view').dataset.id})`;
+                queryDatabase(actorQuery);
+                queryDatabase(StarsInQuery);
+                nextActorId++;
+            }
+            activeContentEditableItem.innerText = row.name;
+            activeContentEditableItem.dataset.id = row.id;
+        }
+        else {
+            const inputNode = document.getElementById('actor');
             inputNode.value = row.name;
             inputNode.dataset.id = row.id; // add a data attribute
             // TODO: clear this if the value is changed / cleared
@@ -520,11 +614,28 @@ function addDirectorResult(row) {
         });
 
         // set the value in the find view
-        const inputNode = document.getElementById('director');
-        if (inputNode != null) {
+        if (document.getElementById('movie-view').hasAttribute('data-id') == true) {
+            if (activeContentEditableItem != null && activeContentEditableItem.hasAttribute('data-id') && activeContentEditableItem.dataset.id != row.id) {
+                activeContentEditableItem.dataset.edit = true;
+                if (activeContentEditableItem.hasAttribute('data-removed') == false) {
+                    activeContentEditableItem.dataset.removed = activeContentEditableItem.dataset.id;
+                }
+            }
+            else { // new director
+                activeContentEditableItem = addDirector(row);
+                const directorQuery = `INSERT INTO Director (id, name) VALUES (${row.id}, "${row.name}")`;
+                const directsQuery = `INSERT INTO Directs (dID, mID) VALUES (${nextDirectorId}, ${document.getElementById('movie-view').dataset.id})`;
+                queryDatabase(directorQuery);
+                queryDatabase(directsQuery);
+                nextActorId++;
+            }
+            activeContentEditableItem.innerText = row.name;
+            activeContentEditableItem.dataset.id = row.id;
+        }
+        else {
+            const inputNode = document.getElementById('director');
             inputNode.value = row.name;
             inputNode.dataset.id = row.id; // add a data attribute
-            // TODO: clear this if the value is changed / cleared
         }
         document.getElementById('search-input').value = ''; // clear search input
     });
@@ -577,17 +688,22 @@ findAddbutton.addEventListener('click', () => {
     }
 });
 
+function populateActorDirectorResults(name, type) {
+    switch (type) {
+    case 'actor':
+        addActorResult({ id: nextActorId, name });
+        callbackOnDatabase(queryActor(name), addActorResult);
+        break;
+    default:
+        callbackOnDatabase(queryDirector(name), addDirectorResult);
+    }
+}
+
 /* Bind the search button for Actor/Director search */
 search.addEventListener('click', () => {
     const name = document.getElementById('search-input').value;
     if (name != '') {
-        switch (search.dataset.type) {
-        case 'actor':
-            callbackOnDatabase(queryActor(name), addActorResult);
-            break;
-        default:
-            callbackOnDatabase(queryDirector(name), addDirectorResult);
-        }
+        populateActorDirectorResults(name, search.dataset.type);
     }
     hideSearchPopup();
     showSearchResults();
@@ -684,7 +800,7 @@ function saveReviewContent() {
             queryDatabase(query);
 
             // make it so we can get the element easily with an id
-            document.getElementById(`review-${review.dataset.id}`).innerText = review.value; 
+            document.getElementById(`review-${review.dataset.id}`).innerText = review.value;
         }
     }
     else { // new review
@@ -704,11 +820,18 @@ saveReview.addEventListener('click', saveReviewContent);
  */
 function cleanupMovieView() {
     returnToFindMovie();
+    disableEditableItems();
 
     // remove list of actors
     const actorList = document.getElementById('actor-list');
     while (actorList.firstChild != null) {
         actorList.firstChild.remove();
+    }
+
+    // remove directors
+    const directorList = document.getElementById('director-list');
+    while (directorList.firstChild != null) {
+        directorList.firstChild.remove();
     }
 
     // remove list of reviews
@@ -744,12 +867,45 @@ edit.addEventListener('click', () => {
 /* Bind save button to disable editable items */
 saveButton.addEventListener('click', () => {
     //TODO: determine what needs to be saved
+    //TODO: handle rating
+    const mID = document.getElementById('movie-view').dataset.id;
+    const info = document.getElementById('info').value;
+    const releaseDate = document.getElementById('releaseDate-movie').value;
+    const runtime = document.getElementById('runtime').value;
+    const query = `UPDATE Movie SET info = "${info}", releaseDate = "${releaseDate}", runtime = ${runtime} WHERE Movie.id = ${mID}`;
+
+    queryDatabase(query);
+
+    Array.from(document.getElementsByClassName('edit-list')).forEach((element) => {
+        if (element.dataset.edit == 'true') {
+            // remove the links in the tables
+            switch (element.dataset.type) {
+            case 'actor':
+                if (element.dataset.removed != '') {
+                    queryDatabase(`DELETE FROM StarsIn WHERE aID = ${element.dataset.removed} AND mID = ${mID}`);
+                    queryDatabase(`INSERT INTO StarsIn (aID, mID) VALUES (${element.dataset.id}, ${mID})`);
+                }
+                break;
+            default: // director
+                if (element.dataset.removed != '') {
+                    queryDatabase(`DELETE FROM Directs WHERE dID = ${element.dataset.removed} AND mID = ${mID}`);
+                    queryDatabase(`INSERT INTO Directs (dID, mID) VALUES (${element.dataset.id}, ${mID})`);
+                }
+            }
+        }
+        if (element.dataset.new == 'true') {
+            console.log('new thing');
+            console.log(element);
+        }
+    });
+
     disableEditableItems();
 });
 
 searchCancel.addEventListener('click', () => {
     hideShield();
     hideSearchPopup();
+    document.getElementById('search-input').value = '';
 });
 
 //TODO: implement SQL query to delete
@@ -779,4 +935,25 @@ document.getElementById('review-content').addEventListener('input', (e) => {
     if (e.target.dataset.edit != null) {
         e.target.dataset.edit = true;
     }
+});
+
+document.getElementById('cancel-results').addEventListener('click', () => {
+    Array.from(document.getElementsByClassName('result')).forEach((element) => {
+        element.remove();
+    });
+
+    hideSearchResults();
+    hideShield();
+});
+
+document.getElementById('add-actor').addEventListener('click', () => {
+    search.dataset.type = 'actor';
+    showSheild();
+    showSearchPopup('actor');
+});
+
+document.getElementById('add-director').addEventListener('click', () => {
+    search.dataset.type = 'director';
+    showSheild();
+    showSearchPopup('director');
 });
