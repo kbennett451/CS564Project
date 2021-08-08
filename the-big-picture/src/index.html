@@ -35,7 +35,12 @@
           <div class="selection-container" id="rating-input-container">
             <label for="rating">Rating:</label>
             <!--Maybe buttons would be good here-->
-            <input type="number" name="rating" id="" class="criteria">
+            <input type="number" name="rating" id="rating" class="criteria">
+            <select id="select">
+              <option value=">">Greater Than</option>
+              <option value="<">Less Than</option>
+              <option selected value="=">Equal</option>
+            </select>
           </div>
         
           <div class="selection-container" id="actor-input-container">
@@ -60,13 +65,8 @@
         </div>
       </div> <!--View area end-->
       <div class="sidebar">
-        <span class="item">Title</span>
-        <span class="item">Price</span>
-        <span class="item">Year</span>
-        <span class="item">Rating</span>
-        <span class="item">Runtime</span>
-        <span class="item">Actor/Actress</span>
-        <span class="item">Director</span>
+        <span class="item" id="top-movies">Top Movies</span>
+        <span class="item"id="rating-by-year">Rating By Year</span>
       </div> <!-- sidebar end -->
     </div> <!--find a movie end-->
 
@@ -90,7 +90,7 @@
       <div class="right-section"> 
         <div class="edit-container">
           <label for="rating">Rating:</label>
-          <input class="edit-item" type="number" name="rating" id="rating" readonly>
+          <input class="edit-item" type="number" name="rating" id="rating-view" readonly>
         </div>
         <div class="edit-container">
           <label for="runtime">Runtime:</label>
@@ -123,6 +123,14 @@
         <button id="edit">Edit</button>
         <button id="save" class="hide">Save</button>
         <button id="delete-movie">Delete</button>
+      </div>
+    </div>
+
+    <!-- top movies -->
+    <div class="hide" id="top-movie-view">
+      <h3>Top Movies</h3>
+      <div id="top-movies-list" class="top-movies-list">
+
       </div>
     </div>
 

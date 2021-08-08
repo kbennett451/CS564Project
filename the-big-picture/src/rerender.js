@@ -265,6 +265,7 @@ const criteria = {
     releaseDate: '',
     runtime: '',
     rating: '',
+    ratingOperator: '',
     actorName: '',
     actorId: '',
     dirctorName: '',
@@ -275,6 +276,10 @@ const criteria = {
  * Function to take input criteria and convert to an object
  */
 function getSearchCriteria() {
+    criteria.ratingOperator = document.getElementById('select').value;
+    if (criteria.ratingOperator == '') {
+        criteria.ratingOperator = '=';
+    }
     Array.from(document.getElementsByClassName('criteria')).forEach((element) => {
         switch (element.name) {
         case 'title':
@@ -358,7 +363,7 @@ function parseMovieCriteria() {
     }
     if (criteria.rating != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
-        whereClause += ` Movie.rating = ${criteria.rating}`;
+        whereClause += ` Movie.rating ${criteria.ratingOperator} ${criteria.rating} AND Movie.rating != ''`;
     }
     if (criteria.directorId != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
@@ -519,8 +524,9 @@ function queryDirectorFromMovie(movieID) {
  */
 function setMovieViewContent(movie) {
     // data from initial query
+    console.log(movie);
     document.getElementById('movie-title').innerText = movie.title;
-    document.getElementById('rating').value = movie.rating;
+    document.getElementById('rating-view').value = movie.rating;
     document.getElementById('runtime').value = movie.runtime;
     document.getElementById('releaseDate-movie').value = `${movie.releaseDate}`;
     document.getElementById('info').value = movie.info;
@@ -566,7 +572,16 @@ function addMovieResults(movie) {
  * @returns the string SQL query
  */
 function queryActor(name) {
-    return `SELECT Actor.id, Actor.name FROM Actor WHERE Actor.name LIKE '%${name}%'`;
+    let query = 'SELECT Actor.id, Actor.name FROM Actor ';
+    const rating = document.getElementById('rating').value;
+    if (rating != '') {
+        query += `INNER JOIN StarsIn ON aID = Actor.id INNER JOIN Movie ON mID = Movie.id WHERE Movie.rating ${document.getElementById('select').value} ${rating} AND Movie.rating != ''`;
+    }
+    if (name != '') {
+        query += (query.includes('WHERE')) ? ' AND ' : ' WHERE ';
+        query += `Actor.name LIKE '%${name}%'`;
+    }
+    return query;
 }
 
 /**
@@ -575,7 +590,16 @@ function queryActor(name) {
  * @returns the string SQL query
  */
 function queryDirector(name) {
-    return `SELECT Director.id, Director.name FROM Director WHERE Director.name LIKE '%${name}%'`;
+    let query = 'SELECT Director.id, Director.name FROM Director ';
+    const rating = document.getElementById('rating').value;
+    if (rating != '') {
+        query += `INNER JOIN Directs ON dID = Director.id INNER JOIN Movie ON mID = Movie.id WHERE Movie.rating ${document.getElementById('select').value} ${rating}`;
+    }
+    if (name != '') {
+        query += (query.includes('WHERE')) ? ' AND ' : ' WHERE ';
+        query += `Director.name LIKE '%${name}%'`;
+    }
+    return query;
 }
 
 /**
@@ -758,9 +782,7 @@ function populateActorDirectorResults(name, type) {
 /* Bind the search button for Actor/Director search */
 search.addEventListener('click', () => {
     const name = document.getElementById('search-input').value;
-    if (name != '') {
-        populateActorDirectorResults(name, search.dataset.type);
-    }
+    populateActorDirectorResults(name, search.dataset.type);
     hideSearchPopup();
     showSearchResults();
 });
@@ -821,7 +843,7 @@ function handleReviewUpdates() {
     callbackOnDatabase(query, (review) => { // second callback since insert has a poor callback function
         // add to the describes database
         const movieID = document.getElementById('movie-view').dataset.id;
-        
+
         callbackOnDatabase(`INSERT INTO Describes (mID, rID) VALUES (${movieID}, ${review.id})`, (row) => {
             console.log(row);
         }, true);
@@ -1016,4 +1038,36 @@ document.getElementById('add-director').addEventListener('click', () => {
     search.dataset.type = 'director';
     showSheild();
     showSearchPopup('director');
+});
+
+function generateTopResultTemplate(movie) {
+    return `<div class="top-result" data-id="${movie.id}">
+                    <span>${movie.title} - ${movie.rating} - ${movie.count}</span>
+                </div>`;
+}
+
+function addtopResult(row) {
+    const child = htmlToElement(generateTopResultTemplate(row));
+    child.addEventListener('click', (e) => { // add event listener to element
+        document.getElementById('top-movie-view').classList.add('hide');
+        // set the values in the Movie View
+        setMovieViewContent(row);
+        movieView.classList.remove('hide'); // expose the movie view
+    });
+    document.getElementById('top-movies-list').appendChild(child);
+}
+
+const topMoviesButton = document.getElementById('top-movies');
+let areTopMoviesPopulated = false;
+topMoviesButton.addEventListener('click', () => {
+    if (areTopMoviesPopulated == true) {
+        findMovieDiv.classList.add('hide');
+        document.getElementById('top-movie-view').classList.remove('hide');
+        return;
+    }
+    findMovieDiv.classList.add('hide');
+    document.getElementById('top-movie-view').classList.remove('hide');
+    const query = 'SELECT id, title, rating, count, runtime, info, releaseDate FROM movie WHERE rating > 65 AND count>1000000 AND count != ""';
+    callbackOnDatabase(query, addtopResult);
+    areTopMoviesPopulated = true;
 });

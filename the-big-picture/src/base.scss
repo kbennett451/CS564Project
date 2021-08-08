@@ -365,3 +365,38 @@ input {
         }
     }
 }
+#top-movie-view {
+    height: 100vh;
+    width: 100vw;
+    background-color: azure;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+
+    .top-movies-list {
+        height: 80vh;
+        width: 90vw;
+        border: 2px solid blue;
+        overflow-y: scroll;
+        text-align: left;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .top-result {
+        min-height: 25px;
+        min-width: 50vw;
+        text-align: center;
+        margin: 10px;
+        padding: 5px;
+        background-color: #00adc4;
+        border-radius: 10px;
+        color: aliceblue;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+    }
+}

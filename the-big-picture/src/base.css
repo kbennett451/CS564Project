@@ -496,4 +496,60 @@ input {
 .edit-review .content-area textarea {
   width: 100%;
 }
+
+#top-movie-view {
+  height: 100vh;
+  width: 100vw;
+  background-color: azure;
+  padding: 15px;
+  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+#top-movie-view .top-movies-list {
+  height: 80vh;
+  width: 90vw;
+  border: 2px solid blue;
+  overflow-y: scroll;
+  text-align: left;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+#top-movie-view .top-result {
+  min-height: 25px;
+  min-width: 50vw;
+  text-align: center;
+  margin: 10px;
+  padding: 5px;
+  background-color: #00adc4;
+  border-radius: 10px;
+  color: aliceblue;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
 /*# sourceMappingURL=base.css.map */
