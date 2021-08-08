@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-alert */
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-console */ //TODO: probably remove this
@@ -250,7 +251,7 @@ function showReviewEditor() {
  */
 function hideReviewEditor() {
     reviewEditor.classList.add('hide');
-    document.getElementById('review-content').value = '';
+    //document.getElementById('review-content').value = '';
     document.getElementById('review-content').removeAttribute('data-id');
     document.getElementById('review-content').removeAttribute('data-edited');
     hideShield();
@@ -268,6 +269,7 @@ const criteria = {
     actorId: '',
     dirctorName: '',
     directorId: '',
+    reviewString: '',
 };
 /**
  * Function to take input criteria and convert to an object
@@ -297,6 +299,9 @@ function getSearchCriteria() {
                 criteria.actorName = element.value;
             }
             break;
+        case 'review-string':
+            criteria.reviewString = element.value;
+            break;
         case 'director':
             if (element.hasAttribute('data-id')) {
                 criteria.directorId = element.dataset.id;
@@ -322,13 +327,16 @@ function parseMovieCriteria() {
         query += ' INNER JOIN StarsIn ON mID = Movie.id';
     }
     else if (criteria.actorName != '') {
-        query += ` INNER JOIN (SELECT Actor.name, mID FROM StarsIn INNER JOIN Actor ON StarsIn.aID = Actor.id WHERE Actor.name LIKE "%${criteria.actorName}%") ON mID = Movie.id;`;
+        query += ` INNER JOIN (SELECT Actor.name, mID FROM StarsIn INNER JOIN Actor ON StarsIn.aID = Actor.id WHERE Actor.name LIKE "%${criteria.actorName}%") ON mID = Movie.id`;
     }
     if (criteria.directorId != '') {
         query += ' INNER JOIN Directs ON mID = Movie.id';
     }
     else if (criteria.directorName != '') {
-        query += ` INNER JOIN (SELECT Director.name, mID FROM Directs INNER JOIN Director ON Directs.dID = Director.id WHERE Director.name LIKE "%${criteria.directorName}%") ON mID = Movie.id;`;
+        query += ` INNER JOIN (SELECT Director.name, mID FROM Directs INNER JOIN Director ON Directs.dID = Director.id WHERE Director.name LIKE "%${criteria.directorName}%") ON mID = Movie.id`;
+    }
+    if (criteria.reviewString != '') {
+        query += ` INNER JOIN (SELECT Review.content, mID FROM Review INNER JOIN Describes ON Describes.rID = Review.id WHERE Review.content LIKE "%${criteria.reviewString}%") ON mID = Movie.id`;
     }
     let whereClause = '';
     if (criteria.title != '') {
@@ -807,18 +815,19 @@ closeReview.addEventListener('click', hideReviewEditor);
  */
 function handleReviewUpdates() {
     const searchContent = document.getElementById('review-content').value;
-    const query = `SELECT id FROM Review WHERE content = "${searchContent}"`;
+    const query = `SELECT id FROM Review WHERE content = "${searchContent}" ORDER BY id DESC LIMIT 1`;
+    document.getElementById('review-content').value = '';
 
     callbackOnDatabase(query, (review) => { // second callback since insert has a poor callback function
         // add to the describes database
         const movieID = document.getElementById('movie-view').dataset.id;
-        callbackOnDatabase(`INSERT INTO Describes (mID, rID) VALUES (${movieID}, ${review.id})`, () => {
-
+        
+        callbackOnDatabase(`INSERT INTO Describes (mID, rID) VALUES (${movieID}, ${review.id})`, (row) => {
+            console.log(row);
         }, true);
-
         // update the review ID on the view
-        document.getElementById('xxx').dataset.id = review.id;
-        document.getElementById('xxx').id = `review-${review.id}`;
+        document.getElementById('review-xxx').dataset.id = review.id;
+        document.getElementById('review-xxx').id = `review-${review.id}`;
     });
 }
 
