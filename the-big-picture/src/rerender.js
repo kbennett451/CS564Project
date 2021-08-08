@@ -6,6 +6,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 let nextActorId;
 let nextDirectorId;
+let nextMovieId;
 
 /**
  * TODO: likely delete this, mostly for testing
@@ -87,8 +88,17 @@ function getNextDirectorID() {
         nextDirectorId = row.id + 1;
     });
 }
+
+function getNextMovieID() {
+    const query = 'SELECT id FROM Movie ORDER BY id desc LIMIT 1';
+    callbackOnDatabase(query, (row) => {
+        nextMovieId = row.id + 1;
+    });
+}
+
 getNextActorID();
 getNextDirectorID();
+getNextMovieID();
 
 /* Main Menu View */
 const mainMenuDiv = document.getElementsByClassName('main-menu')[0];
@@ -308,6 +318,18 @@ function getSearchCriteria() {
  */
 function parseMovieCriteria() {
     let query = 'SELECT id, title, releaseDate, rating, runtime, info FROM Movie';
+    if (criteria.actorId != '') {
+        query += ' INNER JOIN StarsIn ON mID = Movie.id';
+    }
+    else if (criteria.actorName != '') {
+        query += ` INNER JOIN (SELECT Actor.name, mID FROM StarsIn INNER JOIN Actor ON StarsIn.aID = Actor.id WHERE Actor.name LIKE "%${criteria.actorName}%") ON mID = Movie.id;`;
+    }
+    if (criteria.directorId != '') {
+        query += ' INNER JOIN Directs ON mID = Movie.id';
+    }
+    else if (criteria.directorName != '') {
+        query += ` INNER JOIN (SELECT Director.name, mID FROM Directs INNER JOIN Director ON Directs.dID = Director.id WHERE Director.name LIKE "%${criteria.directorName}%") ON mID = Movie.id;`;
+    }
     let whereClause = '';
     if (criteria.title != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
@@ -329,6 +351,14 @@ function parseMovieCriteria() {
     if (criteria.rating != '') {
         whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
         whereClause += ` Movie.rating = ${criteria.rating}`;
+    }
+    if (criteria.directorId != '') {
+        whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
+        whereClause += ` dID = ${criteria.directorId}`;
+    }
+    if (criteria.actorId != '') {
+        whereClause += whereClause.includes('WHERE') ? ' AND' : ' WHERE';
+        whereClause += ` aID = ${criteria.actorId}`;
     }
     const res = (whereClause != '') ? query += whereClause : query;
     return res;
@@ -407,7 +437,6 @@ function addActor(actor) {
     child.addEventListener('keypress', (e) => {
         if (e.which == '13') {
             activeContentEditableItem = e.target;
-            console.log(activeContentEditableItem);
             e.preventDefault();
             displayContentEditableResults(e.target.innerText, 'actor');
         }
@@ -649,6 +678,25 @@ function addMovieToDatabase() { //TODO: actually file to the database
     getSearchCriteria();
     console.log('Adding Movie');
     console.log(criteria);
+    const insertQuery = `INSERT INTO Movie (id, title, releaseDate, runtime, rating, count) VALUES(${nextMovieId}, "${criteria.title}", "${criteria.releaseDate}", ${criteria.runtime}, ${criteria.rating}, 1)`;
+    queryDatabase(insertQuery);
+    // actors
+    queryDatabase(`INSERT INTO Directs (dID, mID) VALUES (${criteria.directorId}, ${nextMovieId})`);
+    // directors
+    queryDatabase(`INSERT INTO StarsIn (aID, mID) VALUES (${criteria.actorId}, ${nextMovieId})`);
+    const movie = {
+        id: nextMovieId,
+        title: criteria.title,
+        releaseDate: criteria.releaseDate,
+        runtime: criteria.runtime,
+        rating: criteria.rating,
+    };
+    nextMovieId++;
+    findMovieDiv.classList.add('hide');
+    document.getElementById('movie-view').classList.remove('hide');
+    setTimeout(() => {
+        setMovieViewContent(movie);
+    }, 1000);
 }
 
 /**
@@ -740,7 +788,7 @@ searchDirector.addEventListener('click', () => {
 // Cleanup the id if the user changes the name of the director
 document.getElementById('director').addEventListener('input', (e) => {
     if (e.target.dataset.id != null) {
-        e.target.dataset.removeAttribute('data-id'); // if the user changes the value, don't keep the ID
+        e.target.removeAttribute('data-id'); // if the user changes the value, don't keep the ID
     }
 });
 
@@ -912,6 +960,9 @@ searchCancel.addEventListener('click', () => {
 function deleteMovie() {
     const id = document.getElementById('movie-view').dataset.id;
     console.log(`Delete ${id}`);
+    queryDatabase(`DELETE FROM Movie WHERE id = ${id}`);
+    queryDatabase(`DELETE FROM StarsIn WHERE mID = ${id}`);
+    queryDatabase(`DELETE FROM Directs WHERE mID = ${id}`);
     cleanupMovieView();
 }
 
