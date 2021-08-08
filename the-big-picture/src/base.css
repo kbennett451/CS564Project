@@ -497,7 +497,7 @@ input {
   width: 100%;
 }
 
-#top-movie-view {
+#top-movie-view, #rating-by-year-view {
   height: 100vh;
   width: 100vw;
   background-color: azure;
@@ -509,16 +509,18 @@ input {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
 }
 
-#top-movie-view .top-movies-list {
+#top-movie-view .top-movies-list, #top-movie-view .rating-by-year-list, #rating-by-year-view .top-movies-list, #rating-by-year-view .rating-by-year-list {
   height: 80vh;
   width: 90vw;
-  border: 2px solid blue;
   overflow-y: scroll;
   text-align: left;
   -webkit-box-align: center;
@@ -533,7 +535,7 @@ input {
           flex-direction: column;
 }
 
-#top-movie-view .top-result {
+#top-movie-view .top-result, #top-movie-view .rating-result, #rating-by-year-view .top-result, #rating-by-year-view .rating-result {
   min-height: 25px;
   min-width: 50vw;
   text-align: center;

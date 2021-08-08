@@ -365,7 +365,8 @@ input {
         }
     }
 }
-#top-movie-view {
+
+#top-movie-view, #rating-by-year-view {
     height: 100vh;
     width: 100vw;
     background-color: azure;
@@ -373,12 +374,12 @@ input {
     text-align: center;
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-direction: column;
 
-    .top-movies-list {
+    .top-movies-list, .rating-by-year-list {
         height: 80vh;
         width: 90vw;
-        border: 2px solid blue;
         overflow-y: scroll;
         text-align: left;
         align-items: center;
@@ -386,7 +387,7 @@ input {
         flex-direction: column;
     }
 
-    .top-result {
+    .top-result, .rating-result {
         min-height: 25px;
         min-width: 50vw;
         text-align: center;

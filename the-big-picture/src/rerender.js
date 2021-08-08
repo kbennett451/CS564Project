@@ -1048,9 +1048,13 @@ function generateTopResultTemplate(movie) {
 
 function addtopResult(row) {
     const child = htmlToElement(generateTopResultTemplate(row));
-    child.addEventListener('click', (e) => { // add event listener to element
+    child.addEventListener('click', () => { // add event listener to element
         document.getElementById('top-movie-view').classList.add('hide');
         // set the values in the Movie View
+        const nodeList = document.getElementById('top-movies-list');
+        while (nodeList.firstChild != null) {
+            nodeList.firstChild.remove();
+        }
         setMovieViewContent(row);
         movieView.classList.remove('hide'); // expose the movie view
     });
@@ -1058,16 +1062,48 @@ function addtopResult(row) {
 }
 
 const topMoviesButton = document.getElementById('top-movies');
-let areTopMoviesPopulated = false;
+
 topMoviesButton.addEventListener('click', () => {
-    if (areTopMoviesPopulated == true) {
-        findMovieDiv.classList.add('hide');
-        document.getElementById('top-movie-view').classList.remove('hide');
-        return;
-    }
     findMovieDiv.classList.add('hide');
     document.getElementById('top-movie-view').classList.remove('hide');
     const query = 'SELECT id, title, rating, count, runtime, info, releaseDate FROM movie WHERE rating > 65 AND count>1000000 AND count != ""';
     callbackOnDatabase(query, addtopResult);
-    areTopMoviesPopulated = true;
+});
+
+function generateYearResultTemplate(row) {
+    return `<div class="rating-result">
+                <span>${row.year} - ${row.average}</span>
+            </div>`;
+}
+
+function addYearResult(row) {
+    const child = htmlToElement(generateYearResultTemplate(row));
+    document.getElementById('rating-by-year-list').appendChild(child);
+}
+
+document.getElementById('rating-by-year').addEventListener('click', () => {
+    document.getElementById('find-a-movie').classList.add('hide');
+    document.getElementById('rating-by-year-view').classList.remove('hide');
+
+    const query = 'SELECT  ROUND(AVG(rating),0) "average", strftime("%Y",releaseDate) "year" FROM Movie WHERE year != "" GROUP BY year HAVING count(*)>0 ORDER BY year DESC';
+    callbackOnDatabase(query, addYearResult);
+});
+
+document.getElementById('back-from-rating-view').addEventListener('click', () => {
+    document.getElementById('rating-by-year-view').classList.add('hide');
+    showFindMovie();
+    const nodeList = document.getElementById('rating-by-year-list');
+    while (nodeList.firstChild != null) {
+        nodeList.firstChild.remove();
+    }
+});
+
+document.getElementById('back-from-top-movies').addEventListener('click', () => {
+    document.getElementById('top-movie-view').classList.add('hide');
+    showFindMovie();
+
+    const nodeList = document.getElementById('top-movies-list');
+    while (nodeList.firstChild != null) {
+        nodeList.firstChild.remove();
+    }
 });
